@@ -1,0 +1,36 @@
+# Core CrewAI dependencies
+crewai>=0.86.0,<1.0.0
+crewai-tools>=0.17.0
+groq>=0.9.0
+
+# Document processing and chunking
+markitdown>=0.0.1a2
+chonkie[semantic]>=0.2.0
+
+# Vector database and embeddings
+qdrant-client>=1.7.0
+fastembed>=0.2.0
+
+# Streamlit for web interface
+streamlit>=1.31.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Web search tools
+firecrawl-py>=0.0.16
+
+# Additional utilities
+pydantic>=2.0.0
+pyyaml>=6.0.0
+
+# Optional: For local LLM support via Ollama
+# Note: Ollama itself needs to be installed separately
+# Download from: https://ollama.ai
+
+# Optional: For OpenAI variant (app.py)
+# Uncomment if using OpenAI models
+# openai>=1.0.0
+
+# Optional: For Serper web search (app.py)
+# Note: SerperDevTool is included in crewai-tools
