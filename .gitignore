@@ -44,3 +44,6 @@ Thumbs.db
 # Project specific
 *.pdf
 !knowledge/*.pdf
+
+# Understand Anything
+.understand-anything/

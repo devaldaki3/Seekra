@@ -1,80 +1,112 @@
-# 🤖 Agentic RAG - PDF Q&A
+<div align="center">
+  <h1>Seekra: Agentic RAG - PDF Q&A</h1>
+  
+  <p><b>AI-Powered PDF Question Answering System using CrewAI and Groq</b></p>
+  
+  [![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white)](#)
+  [![Streamlit](https://img.shields.io/badge/Streamlit-1.31+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](#)
+  [![Groq](https://img.shields.io/badge/Groq-Fast_Inference-f55036?style=for-the-badge)](#)
+  [![CrewAI](https://img.shields.io/badge/CrewAI-Agents-ff6c37?style=for-the-badge)](#)
+  [![Qdrant](https://img.shields.io/badge/Qdrant-Vector_DB-ff4e42?style=for-the-badge)](#)
+</div>
 
-AI-Powered PDF Question Answering System using CrewAI and Groq
+<br/>
 
-Upload any PDF and ask questions - get complete, AI-generated answers powered by advanced language models!
+Seekra enables users to upload PDF documents and execute natural language queries against their contents. The system leverages an agentic orchestration layer to retrieve context dynamically and synthesize coherent responses via open-weight language models.
 
-## 🌟 Features
+## Features
 
-- 📄 **PDF Upload & Search** - Upload any PDF document and ask questions
-- 🤖 **AI-Powered Answers** - Complete, coherent responses using state-of-the-art LLMs
-- 🎯 **Smart Search** - Searches PDF first, then web if needed (optional)
-- 🔑 **User-Provided API Keys** - Secure, no hardcoded secrets
-- 🎨 **Model Selection** - Choose from multiple Groq models
-- 💰 **100% FREE** - Uses FREE Groq API (no OpenAI costs!)
-- 🚀 **Fast & Reliable** - Powered by Groq's lightning-fast inference
-- 🔒 **Privacy-Focused** - Your API keys and documents are never stored
+- **PDF Ingestion & Indexing:** Direct uploading of PDF documents for immediate vector indexing and semantic search capabilities.
+- **Agentic Response Pipeline:** Utilizes a dual-agent configuration (Retriever and Synthesizer) to ensure context isolation and reduce hallucination.
+- **Dynamic Fallback Search:** Automatically queries the public internet via the Serper API when the primary local document lacks the required context.
+- **Stateless Authentication:** Requires client-provided API keys injected at runtime, ensuring complete host-side database privacy and zero persistent secret storage.
+- **Selectable Inference Engines:** Supports multiple Groq-hosted open-weight models (Llama 3.3, Mixtral, Gemma).
+- **Zero-Cost Telemetry:** Operates natively via the Groq free-tier limits, bypassing traditional API costs associated with proprietary models.
 
-## 🎯 Live Demo
+---
 
-[Deploy your own!](https://share.streamlit.io)
+## Quick Start
 
-## 🚀 Quick Start
+### 1. Acquire API Keys
 
-### 1. Get FREE API Key
+The application operates without hardcoded backend secrets. You must supply your own development keys:
+- **Groq API** (Required for core LLM inference): [console.groq.com](https://console.groq.com)
+- **Serper API** (Optional for internet fallback): [serper.dev](https://serper.dev)
 
-Get your FREE Groq API key (no credit card required):
-- Go to: [console.groq.com](https://console.groq.com)
-- Sign up for FREE
-- Get your API key
-
-### 2. Run Locally
+### 2. Local Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/agentic-rag-pdf-qa.git
-cd agentic-rag-pdf-qa
+git clone https://github.com/devaldaki3/Seekra.git
+cd Seekra
+
+# Create a virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the app
-streamlit run app_final.py
+# Run the application
+streamlit run app.py
 ```
 
-### 3. Use the App
+### 3. Usage
 
-1. **Enter your Groq API key** in the sidebar
-2. **Select a model** (Llama 3.3 70B recommended)
-3. **Upload a PDF** document
-4. **Ask questions** and get AI-powered answers!
+1. Input your Groq API key in the sidebar configuration.
+2. Select an active model (Defaults to Llama 3.3 70B).
+3. Upload a target PDF document.
+4. Execute queries against the document via the chat interface.
 
-## 📦 Installation
+---
 
-### Requirements
+## Architecture & Technology Stack
 
-- Python 3.10 or higher
-- pip
+- **Frontend Environment**: Streamlit
+- **LLM Provider**: Groq API
+- **Document Parser**: MarkItDown
+- **Vector Pipeline**: Qdrant (Database) + Chonkie (Semantic Chunking) + FastEmbed (Embeddings)
+- **Orchestration**: CrewAI
+- **Web Search Integration**: Serper API
 
-### Install Dependencies
+### System Flow
+1. **Upload Phase**: A PDF is ingested into temporary volatile storage.
+2. **Indexing Phase**: The document is converted to markdown, split semantically, and persisted to a localized ephemeral Qdrant vector space.
+3. **Query Phase**: The user submits a query via the WebSocket thread.
+4. **Retrieval**: The CrewAI Retriever Agent parses the query and invokes the `DocumentSearchTool` (or `SerperDevTool`).
+5. **Synthesis**: The Synthesis Agent organizes the raw chunk data into a formatted response payload.
+6. **Delivery**: The synthesized payload overrides the UI block.
 
-```bash
-pip install -r requirements.txt
+---
+
+## Project Structure
+
+```text
+Seekra/
+├── app.py                    # Application entry point and UI definition
+├── requirements.txt          # Python environment dependencies
+├── README.md                 # Primary system documentation
+├── .gitignore                # Target exclusions for version control
+├── knowledge/                # Evaluation documents dataset
+│   └── dspy.pdf            
+└── src/
+    └── agentic_rag/
+        └── tools/
+            └── custom_tool.py  # Qdrant client mapping and Tool class logic
 ```
 
-### Dependencies Include:
+---
 
-- `streamlit` - Web interface
-- `crewai` - AI agent framework
-- `markitdown` - PDF text extraction
-- `chonkie` - Semantic chunking
-- `qdrant-client` - Vector database
-- `fastembed` - Fast embeddings
-- `python-dotenv` - Environment variables
+## Streamlit Cloud Deployment
 
-## 🌐 Deploy to Streamlit Cloud
+The stateless nature of the application allows for zero-configuration deployments.
 
-1. **Push to GitHub**
+1. **Initialize Remote Repository**
    ```bash
    git init
    git add .
@@ -82,98 +114,18 @@ pip install -r requirements.txt
    git push origin main
    ```
 
-2. **Deploy on Streamlit Cloud**
-   - Go to [share.streamlit.io](https://share.streamlit.io)
-   - Connect your GitHub repository
-   - Select `app_final.py` as the main file
-   - Deploy!
-
-3. **No Secrets Needed!**
-   - Users will enter their own API keys in the UI
-   - No need to configure secrets in Streamlit Cloud
-
-## 🛠️ Tech Stack
-
-- **Frontend**: Streamlit
-- **LLM**: Groq API (Llama 3.3 70B, Mixtral, Gemma)
-- **PDF Processing**: MarkItDown
-- **Vector Search**: Qdrant + Chonkie
-- **AI Agents**: CrewAI
-- **Web Search**: FireCrawl (optional)
-
-## 📖 How It Works
-
-1. **PDF Upload**: User uploads a PDF document
-2. **Indexing**: PDF is converted to text and chunked semantically
-3. **Vector Storage**: Chunks are stored in Qdrant vector database
-4. **Question**: User asks a question
-5. **Retrieval**: AI agent searches PDF for relevant information
-6. **Synthesis**: AI synthesizes a complete answer from retrieved chunks
-7. **Response**: User gets a coherent, AI-generated answer
-
-## 🎨 Available Models
-
-- **Llama 3.3 70B** (Recommended) - Best quality, comprehensive answers
-- **Llama 3.1 8B** - Faster responses, good quality
-- **Mixtral 8x7B** - Excellent reasoning capabilities
-- **Gemma 2 9B** - Balanced performance
-
-## 💡 Why This App?
-
-✅ **No OpenAI costs** - Uses FREE Groq API  
-✅ **Complete answers** - Not just chunks, full AI synthesis  
-✅ **Privacy-focused** - API keys never stored  
-✅ **Fast** - Groq's inference is lightning fast  
-✅ **Easy to deploy** - One-click Streamlit Cloud deployment  
-✅ **User-controlled** - Users provide their own API keys  
-✅ **Model choice** - Select the best model for your needs  
-
-## 🔒 Privacy & Security
-
-- ✅ API keys are **never stored** - only used during your session
-- ✅ PDFs are processed **locally** in temporary storage
-- ✅ No data is sent to external servers except Groq API
-- ✅ Session data is cleared when you close the browser
-
-## 📝 Project Structure
-
-```
-agentic-rag-pdf-qa/
-├── app_final.py              # Main Streamlit application
-├── requirements.txt          # Python dependencies
-├── README.md                 # This file
-├── DEPLOYMENT_GUIDE.md       # Detailed deployment instructions
-├── .gitignore               # Git ignore rules
-├── knowledge/               # Sample PDF files
-│   └── dspy.pdf            # Example document
-└── src/
-    └── agentic_rag/
-        └── tools/
-            └── custom_tool.py  # Custom search tools
-```
-
-## 🤝 Contributing
-
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📄 License
-
-MIT License - Feel free to use and modify!
-
-## 🙏 Acknowledgments
-
-- **CrewAI** - AI agent framework
-- **Groq** - FREE, fast LLM inference
-- **Streamlit** - Amazing web framework
-- **Qdrant** - Vector database
-- **Chonkie** - Semantic chunking
-
-## ⭐ Star this repo if you find it useful!
+2. **Trigger Deployment**
+   - Navigate to [share.streamlit.io](https://share.streamlit.io).
+   - Authorize GitHub access and select the repository.
+   - Designate `app.py` as the primary executable.
+   - Execute the deployment. Secrets configuration in the Streamlit Cloud dashboard is unnecessary.
 
 ---
 
-**Built with ❤️ for the AI community**
+
+
+## Acknowledgments
+- Implementation framework provided by **CrewAI**.
+- Accelerated open-weight inference provided by **Groq**.
+- Web interaction layer built on **Streamlit**.
+- Vector optimizations handled via **Qdrant** and **Chonkie**.
